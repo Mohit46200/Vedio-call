@@ -109,41 +109,7 @@ export default function Home() {
 
           </div>
 
-          {/* Features */}
-
-          <div className="mt-20 grid grid-cols-1 gap-6 md:grid-cols-3">
-
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-              <h2 className="text-4xl font-bold text-orange-400">
-                100%
-              </h2>
-
-              <p className="mt-2 text-slate-400">
-                Secure Meetings
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-              <h2 className="text-4xl font-bold text-orange-400">
-                HD
-              </h2>
-
-              <p className="mt-2 text-slate-400">
-                Crystal Clear Video
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-              <h2 className="text-4xl font-bold text-orange-400">
-                24/7
-              </h2>
-
-              <p className="mt-2 text-slate-400">
-                Always Available
-              </p>
-            </div>
-
-          </div>
+          
 
         </div>
 
