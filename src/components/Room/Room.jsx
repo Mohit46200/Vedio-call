@@ -7,9 +7,6 @@ const Room = () => {
     const socket = useSocket()
     const {peer,createOffer} = usePeer()
 
-    useEffect(() => {
-  console.log("Room mounted");
-}, []);
 
     const handleNewUserJoined = useCallback(async(data) => {
         const {email} = data
@@ -28,11 +25,11 @@ const Room = () => {
         socket.on("user-joined",handleNewUserJoined)
         socket.on('incoming-call',handleIncomingCall)
 
-        return () => {
-            socket.off("user-joined",handleNewUserJoined)
-            socket.off("incoming-call",handleIncomingCall)
+        // return () => {
+        //     socket.off("user-joined",handleNewUserJoined)
+        //     socket.off("incoming-call",handleIncomingCall)
 
-        }
+        // }
 
     },[socket,handleNewUserJoined,handleIncomingCall])
 
