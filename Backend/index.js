@@ -2,6 +2,10 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const { Server } = require("socket.io");
 
+// socket.io needs a proper CORS options object, not a boolean.
+// `cors: true` is not a valid option and can cause the browser's
+// WebSocket/polling handshake from your frontend (e.g. localhost:3000
+// or 5173) to be rejected.
 const io = new Server({
     cors: {
         origin: "*",
@@ -20,15 +24,6 @@ io.on("connection", socket => {
     socket.on("joined-room", (data) => {
         const { email, room_id } = data
         console.log("user", email, "joined room", room_id)
-
-        const existingSocketId = emailToSocketMapping.get(email)
-        if (existingSocketId && existingSocketId !== socket.id) {
-            console.warn(`Email "${email}" is already in use by socket ${existingSocketId}; socket ${socket.id} is about to overwrite it.`)
-            socket.emit("join-error", {
-                message: `The email "${email}" is already connected from another tab/device. Use a different email for each participant.`
-            })
-        }
-
         emailToSocketMapping.set(email, socket.id)
         socketToEmailMapping.set(socket.id, email)
         socket.join(room_id)
@@ -47,14 +42,6 @@ io.on("connection", socket => {
         socket.to(socketId).emit("call-accepted", { ans })
     })
 
-    socket.on("ice-candidate", (data) => {
-        const { email, candidate } = data
-        const socketId = emailToSocketMapping.get(email)
-        if (socketId) {
-            socket.to(socketId).emit("ice-candidate", { candidate })
-        }
-    })
-
     socket.on("disconnect", () => {
         const email = socketToEmailMapping.get(socket.id)
         if (email) {
@@ -66,3 +53,4 @@ io.on("connection", socket => {
 
 app.listen(8000, () => { console.log("Server is running on port 8000") })
 io.listen(8001)
+

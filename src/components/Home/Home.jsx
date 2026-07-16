@@ -12,19 +12,12 @@ const Home = () => {
     navigate(`/room/${room_id}`)
   }, [navigate])
 
-  const handleJoinError = useCallback(({ message }) => {
-    console.error(message)
-    alert(message)
-  }, [])
-
   useEffect(() => {
     socket.on("joined-room", handleRoomJoined)
-    socket.on("join-error", handleJoinError)
     return () => {
       socket.off("joined-room", handleRoomJoined)
-      socket.off("join-error", handleJoinError)
     }
-  }, [socket, handleRoomJoined, handleJoinError])
+  }, [socket, handleRoomJoined])
 
   const handlejoinroom = () => {
     if (!email || !room_id) return
@@ -68,3 +61,5 @@ const Home = () => {
 };
 
 export default Home;
+
+

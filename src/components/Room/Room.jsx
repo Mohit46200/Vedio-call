@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 const Room = () => {
   const socket = useSocket()
 
-  const { peer, createOffer, createAnswer, setRemoteAns, sendStream, remoteStream, setPolite } = usePeer()
+  const { peer, createOffer, createAnswer, setRemoteAns, sendStream, remoteStream } = usePeer()
 
   const [myStream, setMyStream] = useState(null)
   const [remoteEmailId, setRemoteEmailId] = useState(null)
@@ -13,54 +13,34 @@ const Room = () => {
   const myVideoRef = useRef(null)
   const remoteVideoRef = useRef(null)
 
-
+  // Keep a ref in sync with remoteEmailId so callbacks that must stay
+  // stable (like the negotiationneeded handler) can always read the
+  // latest value instead of capturing a stale one.
   const remoteEmailIdRef = useRef(null)
   useEffect(() => {
     remoteEmailIdRef.current = remoteEmailId
   }, [remoteEmailId])
 
-  const mediaPromiseRef = useRef(null)
-  const getUserMediaStream = useCallback(() => {
-    if (!mediaPromiseRef.current) {
-      mediaPromiseRef.current = navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-          setMyStream(stream)
-          sendStream(stream)
-          return stream
-        })
-        .catch((err) => {
-          console.error("Could not access camera/microphone:", err)
-          mediaPromiseRef.current = null
-          throw err
-        })
-    }
-    return mediaPromiseRef.current
-  }, [sendStream])
-
   const handleNewUserJoined = useCallback(
     async ({ email }) => {
       console.log("New user joined room:", email)
-      setPolite(false) // we're the caller in this exchange
-      await getUserMediaStream() // make sure our own tracks are attached first
+
       const offer = await createOffer()
       socket.emit("call-user", { email, offer })
       setRemoteEmailId(email)
     },
-    [createOffer, socket, getUserMediaStream, setPolite]
+    [createOffer, socket]
   )
 
   const handleIncomingCall = useCallback(
     async ({ from, offer }) => {
       console.log("Incoming call from:", from, offer)
-      setPolite(true) // we're the callee in this exchange
-      await getUserMediaStream() // make sure our own tracks are attached first
+
       const ans = await createAnswer(offer)
-      if (!ans) return // offer lost a negotiation collision, nothing to answer
       socket.emit("call-accepted", { email: from, ans })
       setRemoteEmailId(from)
     },
-    [createAnswer, socket, getUserMediaStream, setPolite]
+    [createAnswer, socket]
   )
 
   const handleCallAccepted = useCallback(
@@ -71,8 +51,22 @@ const Room = () => {
     [setRemoteAns]
   )
 
+  const getUserMediaStream = useCallback(async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
+
+    setMyStream(stream)
+  }, [])
+
+  // This is the key fix: when negotiationneeded fires (e.g. because a
+  // track was just added to the peer connection), we must create a
+  // *fresh* offer via createOffer() and send that - not re-send
+  // peer.localDescription, which is stale and won't include the new
+  // media. We also read the target email from a ref so this callback
+  // never goes stale even though it's only attached once.
   const handlenegotiation = useCallback(async () => {
-    if (!remoteEmailIdRef.current) return
     const localOffer = await createOffer()
     socket.emit('call-user', { email: remoteEmailIdRef.current, offer: localOffer })
   }, [createOffer, socket])
@@ -93,6 +87,16 @@ const Room = () => {
     getUserMediaStream()
   }, [getUserMediaStream])
 
+  // Automatically push our local tracks onto the peer connection as
+  // soon as we have them, instead of relying only on a manual button
+  // click. sendStream is now guarded against re-adding the same track,
+  // so this is safe to fire whenever myStream/sendStream change.
+  useEffect(() => {
+    if (myStream) {
+      sendStream(myStream)
+    }
+  }, [myStream, sendStream])
+
   useEffect(() => {
     if (myVideoRef.current && myStream) {
       myVideoRef.current.srcObject = myStream;
@@ -102,9 +106,6 @@ const Room = () => {
   useEffect(() => {
     if (remoteVideoRef.current && remoteStream) {
       remoteVideoRef.current.srcObject = remoteStream
-      remoteVideoRef.current.play().catch((err) => {
-        console.warn("Remote video playback was blocked:", err)
-      })
     }
   }, [remoteStream])
 
@@ -118,6 +119,7 @@ const Room = () => {
   return (
     <div>
       <h1>Room</h1>
+      <button onClick={() => sendStream(myStream)}>Send my video</button>
       <h2>My Video</h2>
       <h4>you are connected to {remoteEmailId}</h4>
       <video
@@ -140,3 +142,6 @@ const Room = () => {
 };
 
 export default Room;
+
+
+

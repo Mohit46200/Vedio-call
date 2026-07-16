@@ -14,44 +14,16 @@ export const PeerProvider = (props) => {
                     "stun:stun.l.google.com:19302",
                     "stun:global.stun.twilio.com:3478"
                 ],
-            },
-            {
-                urls: "turn:openrelay.metered.ca:80",
-                username: "openrelayproject",
-                credential: "openrelayproject",
-            },
-            {
-                urls: "turn:openrelay.metered.ca:443",
-                username: "openrelayproject",
-                credential: "openrelayproject",
-            },
-            {
-                urls: "turn:openrelay.metered.ca:443?transport=tcp",
-                username: "openrelayproject",
-                credential: "openrelayproject",
-            },
+            }
         ]
     }), [])
 
+    // Track which track ids we've already added, so calling sendStream
+    // more than once (e.g. from an effect + a button) doesn't try to
+    // add the same track twice, which throws.
     const addedTrackIds = useRef(new Set())
 
-    const politeRef = useRef(true)
-    const makingOfferRef = useRef(false)
-
-    const setPolite = useCallback((value) => {
-        politeRef.current = value
-    }, [])
-
     const createAnswer = useCallback(async (offer) => {
-        const offerCollision = makingOfferRef.current || peer.signalingState !== "stable"
-
-        if (offerCollision) {
-            if (!politeRef.current) {
-                return null
-            }
-            await peer.setLocalDescription({ type: "rollback" })
-        }
-
         await peer.setRemoteDescription(offer)
         const answer = await peer.createAnswer()
         await peer.setLocalDescription(answer)
@@ -63,14 +35,9 @@ export const PeerProvider = (props) => {
     }, [peer])
 
     const createOffer = useCallback(async () => {
-        try {
-            makingOfferRef.current = true
-            const offer = await peer.createOffer()
-            await peer.setLocalDescription(offer)
-            return offer
-        } finally {
-            makingOfferRef.current = false
-        }
+        const offer = await peer.createOffer()
+        await peer.setLocalDescription(offer)
+        return offer
     }, [peer])
 
     const sendStream = useCallback(async (stream) => {
@@ -97,25 +64,15 @@ export const PeerProvider = (props) => {
         }
     }, [peer, handleTrackEvent])
 
-    useEffect(() => {
-        const logIce = () => console.log("[peer] iceConnectionState:", peer.iceConnectionState)
-        const logConn = () => console.log("[peer] connectionState:", peer.connectionState)
-        const logIceError = (ev) => console.warn("[peer] ICE candidate error:", ev.errorText || ev)
-
-        peer.addEventListener('iceconnectionstatechange', logIce)
-        peer.addEventListener('connectionstatechange', logConn)
-        peer.addEventListener('icecandidateerror', logIceError)
-
-        return () => {
-            peer.removeEventListener('iceconnectionstatechange', logIce)
-            peer.removeEventListener('connectionstatechange', logConn)
-            peer.removeEventListener('icecandidateerror', logIceError)
-        }
-    }, [peer])
-
-    const value = useMemo(() => ({peer,createOffer,createAnswer,setRemoteAns,sendStream,remoteStream,
-        setPolite
-    }), [peer, createOffer, createAnswer, setRemoteAns, sendStream, remoteStream, setPolite])
+    const value = useMemo(() => ({
+        peer,
+        createOffer,
+        createAnswer,
+        setRemoteAns,
+        sendStream,
+        remoteStream
+    }), [peer, createOffer, createAnswer, setRemoteAns, sendStream, remoteStream])
 
     return <PeerContext.Provider value={value}>{props.children}</PeerContext.Provider>
 }
+
