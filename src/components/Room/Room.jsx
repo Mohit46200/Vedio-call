@@ -73,11 +73,11 @@ const Room = () => {
     socket.on("incoming-call", handleIncomingCall)
     socket.on("call-accepted", handleCallAccepted)
 
-    // return () => {
-    //   socket.off("user-joined", handleNewUserJoined)
-    //   socket.off("incoming-call", handleIncomingCall)
-    //   socket.off("call-accepted", handleCallAccepted)
-    // }
+    return () => {
+      socket.off("user-joined", handleNewUserJoined)
+      socket.off("incoming-call", handleIncomingCall)
+      socket.off("call-accepted", handleCallAccepted)
+    }
   }, [socket, handleNewUserJoined, handleIncomingCall, handleCallAccepted]);
 
   useEffect(() => {
@@ -114,9 +114,8 @@ const Room = () => {
   }, [peer, handlenegotiation])
 
   return (
-    <div>
+    <div className="min-h-screen bg-[#1A1B26] text-white">
       <h1>Room</h1>
-      <button onClick={() => sendStream(myStream)}>Send my video</button>
       <h2>My Video</h2>
       <h4>you are connected to {remoteEmailId}</h4>
       <video
