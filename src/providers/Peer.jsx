@@ -7,7 +7,24 @@ export const usePeer = () => React.useContext(PeerContext)
 export const PeerProvider = (props) => {
     const [remoteStream, setRemoteStream] = useState(null)
 
-    const peer = useMemo(() => new RTCPeerConnection({
+
+// Create RTCPeerConnection
+//         ↓
+// createOffer()
+//         ↓
+// setLocalDescription()
+//         ↓
+// Browser contacts STUN server
+//         ↓
+// STUN returns your public IP
+//         ↓
+// onicecandidate fires with ICE candidates
+//         ↓
+// You send those candidates to the other peer via Socket.IO
+
+
+    const peer = useMemo(() => new RTCPeerConnection({        //these are use to know our public address
+                                                             // after making a offer
         iceServers: [
             {
                 urls: [

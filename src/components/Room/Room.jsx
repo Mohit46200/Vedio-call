@@ -21,8 +21,7 @@ const Room = () => {
     remoteEmailIdRef.current = remoteEmailId
   }, [remoteEmailId])
 
-  const handleNewUserJoined = useCallback(
-    async ({ email }) => {
+  const handleNewUserJoined = useCallback(async ({ email }) => {
       console.log("New user joined room:", email)
 
       const offer = await createOffer()
@@ -32,8 +31,7 @@ const Room = () => {
     [createOffer, socket]
   )
 
-  const handleIncomingCall = useCallback(
-    async ({ from, offer }) => {
+  const handleIncomingCall = useCallback(async ({ from, offer }) => {
       console.log("Incoming call from:", from, offer)
 
       const ans = await createAnswer(offer)
@@ -43,8 +41,7 @@ const Room = () => {
     [createAnswer, socket]
   )
 
-  const handleCallAccepted = useCallback(
-    async ({ ans }) => {
+  const handleCallAccepted = useCallback(async ({ ans }) => {
       console.log("Call accepted")
       await setRemoteAns(ans)
     },
@@ -76,11 +73,11 @@ const Room = () => {
     socket.on("incoming-call", handleIncomingCall)
     socket.on("call-accepted", handleCallAccepted)
 
-    return () => {
-      socket.off("user-joined", handleNewUserJoined)
-      socket.off("incoming-call", handleIncomingCall)
-      socket.off("call-accepted", handleCallAccepted)
-    }
+    // return () => {
+    //   socket.off("user-joined", handleNewUserJoined)
+    //   socket.off("incoming-call", handleIncomingCall)
+    //   socket.off("call-accepted", handleCallAccepted)
+    // }
   }, [socket, handleNewUserJoined, handleIncomingCall, handleCallAccepted]);
 
   useEffect(() => {
