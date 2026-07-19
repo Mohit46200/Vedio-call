@@ -14,8 +14,16 @@ const Home = () => {
 
   useEffect(() => {
     socket.on("joined-room", handleRoomJoined)
+
+    const handleRoomFull = () => {
+      alert("This room already has 2 participants. Please join another room.");
+      }
+    socket.on("room-full", handleRoomFull)
+
+
     return () => {
       socket.off("joined-room", handleRoomJoined)
+      socket.off("room-full", handleRoomFull)
     }
   }, [socket, handleRoomJoined])
 
