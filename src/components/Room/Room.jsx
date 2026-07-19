@@ -102,52 +102,86 @@ const Room = () => {
     }
   }, [peer, handlenegotiation])
 
+
   return (
-  <div className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center p-8">
-    <div className="w-full max-w-6xl">
-      <h1 className="text-3xl font-bold mb-2">Meeting Room</h1>
-
-      <p className="text-gray-400 mb-8">
-        Connected to{" "}
-        <span className="text-white font-medium">
-          {remoteEmailId || "Waiting for participant..."}
-        </span>
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* My Video */}
-        <div className="bg-[#1e293b] rounded-2xl overflow-hidden shadow-xl border border-slate-700">
-          <div className="px-5 py-3 border-b border-slate-700">
-            <h2 className="text-lg font-semibold">Your Camera</h2>
-          </div>
-
-          <video
-            ref={myVideoRef}
-            autoPlay
-            playsInline
-            muted
-            className="w-full aspect-video bg-black object-cover scale-x-[-1]"
-          />
+    <div className="min-h-screen bg-zinc-950 text-white flex flex-col items-center p-8">
+      <div className="w-full max-w-6xl">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="relative inline-flex w-2 h-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60" />
+            <span className="relative inline-flex rounded-full w-2 h-2 bg-amber-400" />
+          </span>
+          <span className="font-mono text-xs uppercase tracking-widest text-zinc-400">
+            Meeting Room · Live
+          </span>
         </div>
 
-        {/* Remote Video */}
-        <div className="bg-[#1e293b] rounded-2xl overflow-hidden shadow-xl border border-slate-700">
-          <div className="px-5 py-3 border-b border-slate-700">
-            <h2 className="text-lg font-semibold">Remote Camera</h2>
+        <h1 className="text-3xl font-extrabold text-zinc-100 mb-2">Meeting Room</h1>
+
+        <p className="text-zinc-400 mb-8 flex items-center gap-2">
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${
+              remoteEmailId ? "bg-emerald-400" : "bg-amber-400"
+            }`}
+          />
+          Connected to{" "}
+          <span className="text-zinc-100 font-medium">
+            {remoteEmailId || "Waiting for participant..."}
+          </span>
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* My Video */}
+          <div className="bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
+            <div className="px-5 py-3 border-b border-zinc-800 flex items-center justify-between">
+              <h2 className="font-mono text-xs uppercase tracking-widest text-zinc-400">
+                Your Camera
+              </h2>
+              <span className="text-xs font-mono text-zinc-600">You</span>
+            </div>
+
+            <video
+              ref={myVideoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full aspect-video bg-black object-cover scale-x-[-1]"
+            />
           </div>
 
-          <video
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-            className="w-full aspect-video bg-black object-cover scale-x-[-1]"
-          />
+          {/* Remote Video */}
+          <div className="bg-zinc-900 rounded-2xl overflow-hidden shadow-2xl border border-zinc-800">
+            <div className="px-5 py-3 border-b border-zinc-800 flex items-center justify-between">
+              <h2 className="font-mono text-xs uppercase tracking-widest text-zinc-400">
+                Remote Camera
+              </h2>
+              <span
+                className={`flex items-center gap-1.5 text-xs font-mono ${
+                  remoteEmailId ? "text-emerald-400" : "text-amber-400"
+                }`}
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    remoteEmailId ? "bg-emerald-400" : "bg-amber-400"
+                  }`}
+                />
+                {remoteEmailId ? "Live" : "Waiting"}
+              </span>
+            </div>
+
+            <video
+              ref={remoteVideoRef}
+              autoPlay
+              playsInline
+              className="w-full aspect-video bg-black object-cover scale-x-[-1]"
+            />
+          </div>
         </div>
       </div>
     </div>
-  </div>
-)
+  )
 }
+
 
 export default Room
 
