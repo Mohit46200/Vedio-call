@@ -13,9 +13,6 @@ const Room = () => {
   const myVideoRef = useRef(null)
   const remoteVideoRef = useRef(null)
 
-  // Keep a ref in sync with remoteEmailId so callbacks that must stay
-  // stable (like the negotiationneeded handler) can always read the
-  // latest value instead of capturing a stale one.
   const remoteEmailIdRef = useRef(null)
   useEffect(() => {
     remoteEmailIdRef.current = remoteEmailId
@@ -57,12 +54,7 @@ const Room = () => {
     setMyStream(stream)
   }, [])
 
-  // This is the key fix: when negotiationneeded fires (e.g. because a
-  // track was just added to the peer connection), we must create a
-  // *fresh* offer via createOffer() and send that - not re-send
-  // peer.localDescription, which is stale and won't include the new
-  // media. We also read the target email from a ref so this callback
-  // never goes stale even though it's only attached once.
+  
   const handlenegotiation = useCallback(async () => {
     const localOffer = await createOffer()
     socket.emit('call-user', { email: remoteEmailIdRef.current, offer: localOffer })
@@ -84,10 +76,7 @@ const Room = () => {
     getUserMediaStream()
   }, [getUserMediaStream])
 
-  // Automatically push our local tracks onto the peer connection as
-  // soon as we have them, instead of relying only on a manual button
-  // click. sendStream is now guarded against re-adding the same track,
-  // so this is safe to fire whenever myStream/sendStream change.
+  
   useEffect(() => {
     if (myStream) {
       sendStream(myStream)
@@ -114,28 +103,51 @@ const Room = () => {
   }, [peer, handlenegotiation])
 
   return (
-    <div className="min-h-screen bg-[#1A1B26] text-white">
-      <h1>Room</h1>
-      <h2>My Video</h2>
-      <h4>you are connected to {remoteEmailId}</h4>
-      <video
-        ref={myVideoRef}
-        autoPlay
-        playsInline
-        muted
-        width={400}
-      />
+  <div className="min-h-screen bg-[#0f172a] text-white flex flex-col items-center p-8">
+    <div className="w-full max-w-6xl">
+      <h1 className="text-3xl font-bold mb-2">Meeting Room</h1>
 
-      <h2>Remote Video</h2>
-      <video
-        ref={remoteVideoRef}
-        autoPlay
-        playsInline
-        width={400}
-      />
+      <p className="text-gray-400 mb-8">
+        Connected to{" "}
+        <span className="text-white font-medium">
+          {remoteEmailId || "Waiting for participant..."}
+        </span>
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* My Video */}
+        <div className="bg-[#1e293b] rounded-2xl overflow-hidden shadow-xl border border-slate-700">
+          <div className="px-5 py-3 border-b border-slate-700">
+            <h2 className="text-lg font-semibold">Your Camera</h2>
+          </div>
+
+          <video
+            ref={myVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full aspect-video bg-black object-cover"
+          />
+        </div>
+
+        {/* Remote Video */}
+        <div className="bg-[#1e293b] rounded-2xl overflow-hidden shadow-xl border border-slate-700">
+          <div className="px-5 py-3 border-b border-slate-700">
+            <h2 className="text-lg font-semibold">Remote Camera</h2>
+          </div>
+
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            className="w-full aspect-video bg-black object-cover"
+          />
+        </div>
+      </div>
     </div>
-  );
-};
+  </div>
+)
+}
 
 export default Room;
 
