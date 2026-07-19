@@ -126,7 +126,7 @@ const Room = () => {
             autoPlay
             playsInline
             muted
-            className="w-full aspect-video bg-black object-cover"
+            className="w-full aspect-video bg-black object-cover scale-x-[-1]"
           />
         </div>
 
@@ -140,7 +140,7 @@ const Room = () => {
             ref={remoteVideoRef}
             autoPlay
             playsInline
-            className="w-full aspect-video bg-black object-cover"
+            className="w-full aspect-video bg-black object-cover scale-x-[-1]"
           />
         </div>
       </div>
@@ -149,7 +149,7 @@ const Room = () => {
 )
 }
 
-export default Room;
+export default Room
 
 
 

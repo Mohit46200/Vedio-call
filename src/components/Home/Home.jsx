@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSocket } from "../../providers/Socket";
+import { useEffect, useState, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
+import { useSocket } from "../../providers/Socket"
 
 const Home = () => {
   const socket = useSocket();
@@ -57,9 +57,9 @@ const Home = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
 
 
