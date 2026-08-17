@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState, useCallback, useRef } from "react"
+import React, { useMemo, useEffect, useState, useCallback, useRef } from "react";
 
 const PeerContext = React.createContext(null)
 
