@@ -11,7 +11,7 @@ export const PeerProvider = (props) => {
 // Create RTCPeerConnection
 //         ↓
 // createOffer()
-//         ↓
+//         ↓                                
 // setLocalDescription()
 //         ↓
 // Browser contacts STUN server
