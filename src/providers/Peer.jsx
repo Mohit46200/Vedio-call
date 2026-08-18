@@ -1,301 +1,114 @@
-// import React, { useMemo, useEffect, useState, useCallback, useRef } from "react";
+import React, { useMemo, useEffect, useState, useCallback, useRef } from "react";
 
-// const PeerContext = React.createContext(null)
+const PeerContext = React.createContext(null)
 
-// export const usePeer = () => React.useContext(PeerContext)
+export const usePeer = () => React.useContext(PeerContext)
 
-// export const PeerProvider = (props) => {
-//     const [remoteStream, setRemoteStream] = useState(null)
-
-
-// // Create RTCPeerConnection
-// //         ↓
-// // createOffer()
-// //         ↓                                
-// // setLocalDescription()
-// //         ↓
-// // Browser contacts STUN server
-// //         ↓
-// // STUN returns your public IP
-// //         ↓
-// // onicecandidate fires with ICE candidates
-// //         ↓
-// // You send those candidates to the other peer via Socket.IO
+export const PeerProvider = (props) => {
+    const [remoteStream, setRemoteStream] = useState(null)
 
 
-//     const peer = useMemo(() => new RTCPeerConnection({        //these are use to know our public address
-//                                                              // after making a offer
-//         // iceServers: [
-//         //     {
-//         //         urls: [
-//         //             "stun:stun.l.google.com:19302",
-//         //             "stun:global.stun.twilio.com:3478"
-//         //         ],
-//         //     }
-//         // ]
-
-//         iceServers: [
-//                 { urls: "stun:stun.relay.metered.ca:80" },
-//                 {
-//                 urls: "turn:global.relay.metered.ca:80",
-//                 username: "openrelayproject",
-//                 credential: "openrelayproject"
-//                 },
-//                 {
-//                 urls: "turn:global.relay.metered.ca:443",
-//                 username: "openrelayproject",
-//                 credential: "openrelayproject"
-//                 },
-//                 {
-//                 urls: "turn:global.relay.metered.ca:443?transport=tcp",
-//                 username: "openrelayproject",
-//                 credential: "openrelayproject"
-//                 }
-//             ]
-//     }), [])
-
-//     // Track which track ids we've already added, so calling sendStream
-//     // more than once (e.g. from an effect + a button) doesn't try to
-//     // add the same track twice, which throws.
-//     const addedTrackIds = useRef(new Set())
-
-//     const createAnswer = useCallback(async (offer) => {
-//         await peer.setRemoteDescription(offer)
-//         const answer = await peer.createAnswer()
-//         await peer.setLocalDescription(answer)
-//         return answer
-//     }, [peer])
-
-//     const setRemoteAns = useCallback(async (ans) => {
-//         await peer.setRemoteDescription(ans)
-//     }, [peer])
-
-//     const createOffer = useCallback(async () => {
-//         const offer = await peer.createOffer()
-//         await peer.setLocalDescription(offer)
-//         return offer
-//     }, [peer])
-
-//     const sendStream = useCallback(async (stream) => {
-//         if (!stream) return
-//         const tracks = stream.getTracks()
-//         for (const track of tracks) {
-//             if (!addedTrackIds.current.has(track.id)) {
-//                 peer.addTrack(track, stream)
-//                 addedTrackIds.current.add(track.id)
-//             }
-//         }
-//     }, [peer])
-
-//     const handleTrackEvent = useCallback((ev) => {
-//         const streams = ev.streams
-//         setRemoteStream(streams[0])
-//     }, [])
-
-//     useEffect(() => {
-//         peer.addEventListener('track', handleTrackEvent)
-
-//         return () => {
-//             peer.removeEventListener('track', handleTrackEvent)
-//         }
-//     }, [peer, handleTrackEvent])
-
-//     const value = useMemo(() => ({
-//         peer,
-//         createOffer,
-//         createAnswer,
-//         setRemoteAns,
-//         sendStream,
-//         remoteStream
-//     }), [peer, createOffer, createAnswer, setRemoteAns, sendStream, remoteStream])
-
-//     return <PeerContext.Provider value={value}>{props.children}</PeerContext.Provider>
-// }
+// Create RTCPeerConnection
+//         ↓
+// createOffer()
+//         ↓                                
+// setLocalDescription()
+//         ↓
+// Browser contacts STUN server
+//         ↓
+// STUN returns your public IP
+//         ↓
+// onicecandidate fires with ICE candidates
+//         ↓
+// You send those candidates to the other peer via Socket.IO
 
 
+    const peer = useMemo(() => new RTCPeerConnection({        //these are use to know our public address
+                                                             // after making a offer
+        // iceServers: [
+        //     {
+        //         urls: [
+        //             "stun:stun.l.google.com:19302",
+        //             "stun:global.stun.twilio.com:3478"
+        //         ],
+        //     }
+        // ]
 
+        iceServers: [
+                { urls: "stun:stun.relay.metered.ca:80" },
+                {
+                urls: "turn:global.relay.metered.ca:80",
+                username: "openrelayproject",
+                credential: "openrelayproject"
+                },
+                {
+                urls: "turn:global.relay.metered.ca:443",
+                username: "openrelayproject",
+                credential: "openrelayproject"
+                },
+                {
+                urls: "turn:global.relay.metered.ca:443?transport=tcp",
+                username: "openrelayproject",
+                credential: "openrelayproject"
+                }
+            ]
+    }), [])
 
+    // Track which track ids we've already added, so calling sendStream
+    // more than once (e.g. from an effect + a button) doesn't try to
+    // add the same track twice, which throws.
+    const addedTrackIds = useRef(new Set())
 
-import React, {
-  useMemo,
-  useEffect,
-  useState,
-  useCallback,
-  useRef,
-} from "react";
+    const createAnswer = useCallback(async (offer) => {
+        await peer.setRemoteDescription(offer)
+        const answer = await peer.createAnswer()
+        await peer.setLocalDescription(answer)
+        return answer
+    }, [peer])
 
-const PeerContext = React.createContext(null);
+    const setRemoteAns = useCallback(async (ans) => {
+        await peer.setRemoteDescription(ans)
+    }, [peer])
 
-export const usePeer = () => React.useContext(PeerContext);
+    const createOffer = useCallback(async () => {
+        const offer = await peer.createOffer()
+        await peer.setLocalDescription(offer)
+        return offer
+    }, [peer])
 
-export const PeerProvider = ({ children }) => {
-  const [remoteStream, setRemoteStream] = useState(null);
-
-  const peer = useMemo(() => {
-    const pc = new RTCPeerConnection({
-      iceServers: [
-        {
-          urls: "stun:stun.relay.metered.ca:80",
-        },
-        {
-          urls: "turn:global.relay.metered.ca:80",
-          username: "openrelayproject",
-          credential: "openrelayproject",
-        },
-        {
-          urls: "turn:global.relay.metered.ca:443",
-          username: "openrelayproject",
-          credential: "openrelayproject",
-        },
-        {
-          urls: "turn:global.relay.metered.ca:443?transport=tcp",
-          username: "openrelayproject",
-          credential: "openrelayproject",
-        },
-      ],
-    });
-
-    return pc;
-  }, []);
-
-  const addedTrackIds = useRef(new Set());
-
-  const createOffer = useCallback(async () => {
-    console.log("Creating offer...");
-
-    const offer = await peer.createOffer();
-
-    await peer.setLocalDescription(offer);
-
-    console.log("Local offer set");
-
-    return peer.localDescription;
-  }, [peer]);
-
-  const createAnswer = useCallback(
-    async (offer) => {
-      console.log("Creating answer...");
-
-      await peer.setRemoteDescription(offer);
-
-      const answer = await peer.createAnswer();
-
-      await peer.setLocalDescription(answer);
-
-      console.log("Local answer set");
-
-      return peer.localDescription;
-    },
-    [peer]
-  );
-
-  const setRemoteAns = useCallback(
-    async (answer) => {
-      console.log("Setting remote answer...");
-
-      await peer.setRemoteDescription(answer);
-
-      console.log("Remote answer set");
-    },
-    [peer]
-  );
-
-  const sendStream = useCallback(
-    async (stream) => {
-      if (!stream) return;
-
-      const tracks = stream.getTracks();
-
-      for (const track of tracks) {
-        if (!addedTrackIds.current.has(track.id)) {
-          console.log("Adding track:", track.kind);
-
-          peer.addTrack(track, stream);
-
-          addedTrackIds.current.add(track.id);
+    const sendStream = useCallback(async (stream) => {
+        if (!stream) return
+        const tracks = stream.getTracks()
+        for (const track of tracks) {
+            if (!addedTrackIds.current.has(track.id)) {
+                peer.addTrack(track, stream)
+                addedTrackIds.current.add(track.id)
+            }
         }
-      }
-    },
-    [peer]
-  );
+    }, [peer])
 
-  useEffect(() => {
-    const handleTrack = (event) => {
-      console.log("REMOTE TRACK RECEIVED:", event.track.kind);
+    const handleTrackEvent = useCallback((ev) => {
+        const streams = ev.streams
+        setRemoteStream(streams[0])
+    }, [])
 
-      if (event.streams && event.streams[0]) {
-        setRemoteStream(event.streams[0]);
-      }
-    };
+    useEffect(() => {
+        peer.addEventListener('track', handleTrackEvent)
 
-    const handleIceState = () => {
-      console.log(
-        "ICE connection state:",
-        peer.iceConnectionState
-      );
-    };
+        return () => {
+            peer.removeEventListener('track', handleTrackEvent)
+        }
+    }, [peer, handleTrackEvent])
 
-    const handleConnectionState = () => {
-      console.log(
-        "Peer connection state:",
-        peer.connectionState
-      );
-    };
+    const value = useMemo(() => ({
+        peer,
+        createOffer,
+        createAnswer,
+        setRemoteAns,
+        sendStream,
+        remoteStream
+    }), [peer, createOffer, createAnswer, setRemoteAns, sendStream, remoteStream])
 
-    const handleIceGatheringState = () => {
-      console.log(
-        "ICE gathering state:",
-        peer.iceGatheringState
-      );
-    };
+    return <PeerContext.Provider value={value}>{props.children}</PeerContext.Provider>
+}
 
-    peer.addEventListener("track", handleTrack);
-    peer.addEventListener("iceconnectionstatechange", handleIceState);
-    peer.addEventListener("connectionstatechange", handleConnectionState);
-    peer.addEventListener(
-      "icegatheringstatechange",
-      handleIceGatheringState
-    );
-
-    return () => {
-      peer.removeEventListener("track", handleTrack);
-      peer.removeEventListener(
-        "iceconnectionstatechange",
-        handleIceState
-      );
-      peer.removeEventListener(
-        "connectionstatechange",
-        handleConnectionState
-      );
-      peer.removeEventListener(
-        "icegatheringstatechange",
-        handleIceGatheringState
-      );
-    };
-  }, [peer]);
-
-  const value = useMemo(
-    () => ({
-      peer,
-      createOffer,
-      createAnswer,
-      setRemoteAns,
-      sendStream,
-      remoteStream,
-    }),
-    [
-      peer,
-      createOffer,
-      createAnswer,
-      setRemoteAns,
-      sendStream,
-      remoteStream,
-    ]
-  );
-
-  return (
-    <PeerContext.Provider value={value}>
-      {children}
-    </PeerContext.Provider>
-  );
-};
