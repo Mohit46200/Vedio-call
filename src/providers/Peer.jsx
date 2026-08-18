@@ -25,33 +25,32 @@ export const PeerProvider = (props) => {
 
     const peer = useMemo(() => new RTCPeerConnection({        //these are use to know our public address
                                                              // after making a offer
-        // iceServers: [
-        //     {
-        //         urls: [
-        //             "stun:stun.l.google.com:19302",
-        //             "stun:global.stun.twilio.com:3478"
-        //         ],
-        //     }
-        // ]
-
         iceServers: [
-                { urls: "stun:stun.relay.metered.ca:80" },
-                {
-                urls: "turn:global.relay.metered.ca:80",
-                username: "openrelayproject",
-                credential: "openrelayproject"
-                },
-                {
-                urls: "turn:global.relay.metered.ca:443",
-                username: "openrelayproject",
-                credential: "openrelayproject"
-                },
-                {
-                urls: "turn:global.relay.metered.ca:443?transport=tcp",
-                username: "openrelayproject",
-                credential: "openrelayproject"
-                }
-            ]
+            {
+                urls: [
+                    "stun:stun.l.google.com:19302",
+                    "stun:global.stun.twilio.com:3478"
+                ],
+            },
+            { urls: "stun:stun.relay.metered.ca:80" },
+            {
+            urls: "turn:global.relay.metered.ca:80",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+            },
+            {
+            urls: "turn:global.relay.metered.ca:443",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+            },
+            {
+            urls: "turn:global.relay.metered.ca:443?transport=tcp",
+            username: "openrelayproject",
+            credential: "openrelayproject"
+            }
+        ]
+
+        
     }), [])
 
     // Track which track ids we've already added, so calling sendStream
